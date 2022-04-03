@@ -2,6 +2,11 @@ import styled,{keyframes} from "styled-components";
 
 const Wapper= styled.div`
  display: flex;
+ height:100vh;
+ width:100vw;
+ justify-content:center;
+ align-items:center;
+
 `;
 const rotationAnimation = keyframes`
 0%{
@@ -17,6 +22,10 @@ border-radius:100px;
 border-radius:0px:
 }
 `;
+
+const Emoji = styled.div`
+font-size: 36px;
+`;
 const Box = styled.div`
 background-color: tomato;
 height:200px;
@@ -25,23 +34,17 @@ animation: ${rotationAnimation} 1s linear infinite;
 display:flex;
 justify-content:center;
 align-items: center;
-span{
-  font-size: 36px;
-  &:hover{
-    font-size: 50px;
-  }
-  &:active {
-    opacity:0;
-  }
+${Emoji}:hover {
+  font-size:98px;
 }
-
-`
+`;
 function App() {
   return (
 <Wapper>
   <Box>
-    <span>🤩</span>
+    <Emoji >🤩</Emoji>
   </Box>
+    <Emoji >👻</Emoji>
 </Wapper>
   );
 }
