@@ -60,6 +60,7 @@ body {
   color:${props => props.theme.textColor};
 }
 a {
+  color:inherit;
   text-decoration:none;
 }
 `;
