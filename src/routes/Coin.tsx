@@ -1,8 +1,10 @@
 import { useEffect,useState } from "react";
-import { Route, Switch, useLocation, useParams } from "react-router-dom";
+import { Route, Switch, useLocation, useParams, useRouteMatch } from "react-router-dom";
 import styled from "styled-components";
 import Chart from "./Chart";
 import Price from "./Price";
+import { Link } from "react-router-dom";
+import { isPropertySignature } from "typescript";
 
 const Container = styled.div`
   padding: 0px 20px;
@@ -47,6 +49,26 @@ const Description = styled.div`
 margin:20px 0px;
 `;
 
+const Tabs = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  margin: 25px 0px;
+  gap: 10px;
+
+`;
+const Tab = styled.span<{ isActive:boolean }>`
+text-align: center;
+text-transform: uppercase;
+font-size: 12px;
+font-weight: 400;
+background-color: ${(props)=>props.theme.boxColor};
+padding: 7px 0px;
+border-radius: 10px;
+color: ${ props => props.isActive ?props.theme.accentColor:props.theme.textColor};
+a {
+  display: block;
+}
+`;
 
 interface RoutParams {
     coinId:string;
@@ -118,13 +140,16 @@ function Coin() {
     const {state} = useLocation<RouteState>();
     const [info,setInfo] = useState<InfoData>();
     const [priceInfo,setPriceInfo] = useState<PriceData>();
-
-    useEffect(()=>{
+    const priceMatch = useRouteMatch("/:coinId/price");
+    //console.log(priceMatch);
+    const chartMatch = useRouteMatch("/:coinId/chart");
+    //console.log(chartMatch);
+        useEffect(()=>{
       (async ()=> {
         const infoData = await (await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)).json();
-       console.log(infoData);
+       //console.log(infoData);
         const priceData = await (await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)).json();
-      console.log(priceData);
+      //console.log(priceData);
         setInfo(infoData);
         setPriceInfo(priceData);
         setLoading(false);
@@ -162,8 +187,15 @@ function Coin() {
         <span>Max Supply:</span>
         <span>{priceInfo?.max_supply}</span>
       </OverviewItem>
-
     </Overview>
+    <Tabs>
+      <Tab isActive ={chartMatch !== null}> 
+    <Link to ={`/${coinId}/chart`}>Chart</Link>
+      </Tab>
+      <Tab isActive = {priceMatch !== null}>
+    <Link to ={`/${coinId}/price`}>Price</Link>
+      </Tab>
+    </Tabs>
     <Switch>
       <Route path={`/${coinId}/price`}>
         <Price/>
