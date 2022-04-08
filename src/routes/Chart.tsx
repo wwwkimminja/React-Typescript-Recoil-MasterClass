@@ -60,11 +60,23 @@ function Chart({coinId}:ChartProps){
             },
             labels:{
                 show:false,
-            }
+            },
+            type:"datetime",
+            categories: data?.map((price)=>price.time_close),
+            
         },
-
-     
-        
+        fill:{
+            type:"gradient",
+            gradient:{
+                gradientToColors: ["#4cd137"],stops:[0,100]},
+            },
+            colors: ["#00a8ff"],
+            tooltip: {
+                y:{
+                    //2 decimal place
+                    formatter:(value) =>`$${value.toFixed(2)}`,
+                },
+            }
     }}
     />
     )}
