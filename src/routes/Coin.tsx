@@ -1,10 +1,12 @@
- import { Route, Switch, useLocation, useParams, useRouteMatch } from "react-router-dom";
+
+import { Route, Switch, useLocation, useParams, useRouteMatch } from "react-router-dom";
 import styled from "styled-components";
 import Chart from "./Chart";
 import Price from "./Price";
 import { Link } from "react-router-dom";
 import { useQuery } from "react-query";
 import { fetchCoinInfo ,fetchCoinTickers} from "./api";
+import { Helmet } from "react-helmet";
 
 const Container = styled.div`
   padding: 0px 20px;
@@ -133,12 +135,14 @@ volume_24h_change_24h :number;
 
   }
 }
-function Coin() {
+function Coin(){
 
  const {coinId} = useParams<RoutParams>();
   const {state} = useLocation<RouteState>();
   const {isLoading:infoLoading,data:infoData} = useQuery<IInfoData>(["info",coinId], () => fetchCoinInfo(coinId));
-  const {isLoading:tickerLoading,data:tickersData} = useQuery<ITickersData>(["tickers",coinId], () => fetchCoinTickers(coinId));
+  const {isLoading:tickerLoading,data:tickersData} = useQuery<ITickersData>(["tickers",coinId], () => fetchCoinTickers(coinId),{
+    refetchInterval:5000,
+  });
    
   const priceMatch = useRouteMatch("/:coinId/price");
   const chartMatch = useRouteMatch("/:coinId/chart");
@@ -147,6 +151,9 @@ function Coin() {
   
   return  (
   <Container>
+    <Helmet>
+      <title>{state?.name ? state.name: loading ? "Loading...": infoData?.name}</title>
+      </Helmet>
   <Header>
     <Title>{state?.name ? state.name: loading ? "Loading...": infoData?.name}</Title>
   </Header>
@@ -162,8 +169,8 @@ function Coin() {
         <span>${infoData?.symbol}</span>
       </OverviewItem>
       <OverviewItem>
-        <span>OPEN SOURCE:</span>
-        <span>{infoData?.open_source? "YES":"NO"}</span>
+        <span>PRICE:</span>
+        <span>${tickersData?.quotes.USD.price.toFixed(3)}</span>
       </OverviewItem>
     </Overview>
     <Description>{infoData?.description}</Description>
@@ -198,4 +205,5 @@ function Coin() {
   </Container>
 );
   }
+
 export default Coin;
