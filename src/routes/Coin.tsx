@@ -4,7 +4,8 @@ import styled from "styled-components";
 import Chart from "./Chart";
 import Price from "./Price";
 import { Link } from "react-router-dom";
-import { isPropertySignature } from "typescript";
+import { useQuery } from "react-query";
+import { fetchCoinInfo ,fetchCoinTickers} from "./api";
 
 const Container = styled.div`
   padding: 0px 20px;
@@ -64,7 +65,7 @@ font-weight: 400;
 background-color: ${(props)=>props.theme.boxColor};
 padding: 7px 0px;
 border-radius: 10px;
-color: ${ props => props.isActive ?props.theme.accentColor:props.theme.textColor};
+color: ${ props => props.isActive?props.theme.accentColor:props.theme.textColor};
 a {
   display: block;
 }
@@ -78,7 +79,7 @@ interface RouteState {
 }
 
 
-interface InfoData {
+interface IInfoData {
   id:string;
   name:string;
   symbol:string;
@@ -97,9 +98,9 @@ interface InfoData {
   hash_algorithm:string;
   first_data_at:string;
   last_data_at:string;
-}
+};
 
-interface PriceData {
+interface ITickersData {
   id: string;
   name: string;
   symbol: string;
@@ -135,57 +136,61 @@ volume_24h_change_24h :number;
 }
 function Coin() {
 
-  const [loading,setLoading] = useState(true);
-    const {coinId} = useParams<RoutParams>();
-    const {state} = useLocation<RouteState>();
-    const [info,setInfo] = useState<InfoData>();
-    const [priceInfo,setPriceInfo] = useState<PriceData>();
-    const priceMatch = useRouteMatch("/:coinId/price");
-    //console.log(priceMatch);
-    const chartMatch = useRouteMatch("/:coinId/chart");
-    //console.log(chartMatch);
+ const {coinId} = useParams<RoutParams>();
+  const {state} = useLocation<RouteState>();
+  const {isLoading:infoLoading,data:infoData} = useQuery<IInfoData>(["info",coinId], () => fetchCoinInfo(coinId));
+  const {isLoading:tickerLoading,data:tickersData} = useQuery<ITickersData>(["tickers",coinId], () => fetchCoinTickers(coinId));
+   
+  const priceMatch = useRouteMatch("/:coinId/price");
+   const chartMatch = useRouteMatch("/:coinId/chart");
+  
+  /* const [loading,setLoading] = useState(true);
+  const [info,setInfo] = useState<IInfoData>();
+  const [priceInfo,setPriceInfo] = useState<ITickersData>();
         useEffect(()=>{
       (async ()=> {
         const infoData = await (await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)).json();
-       //console.log(infoData);
         const priceData = await (await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)).json();
-      //console.log(priceData);
         setInfo(infoData);
         setPriceInfo(priceData);
         setLoading(false);
       })();
     },[coinId])
-    
+      */
+
+  const loading = infoLoading || tickerLoading ;
+   
+  
   return  (
   <Container>
   <Header>
-    <Title>{state?.name ? state.name: loading ? "Loading...":info?.name}</Title>
+    <Title>{state?.name ? state.name: loading ? "Loading...": infoData?.name}</Title>
   </Header>
   {loading ? (<Loader>Loading...</Loader>):(
     <>
     <Overview>
       <OverviewItem>
         <span>RANK:</span>
-        <span>{info?.rank}</span>
+        <span>{infoData?.rank}</span>
       </OverviewItem>
       <OverviewItem>
         <span>SYMBOL:</span>
-        <span>${info?.symbol}</span>
+        <span>${infoData?.symbol}</span>
       </OverviewItem>
       <OverviewItem>
         <span>OPEN SOURCE:</span>
-        <span>{info?.open_source? "YES":"NO"}</span>
+        <span>{infoData?.open_source? "YES":"NO"}</span>
       </OverviewItem>
     </Overview>
-    <Description>{info?.description}</Description>
+    <Description>{infoData?.description}</Description>
     <Overview>
       <OverviewItem>
         <span>Total Supply:</span>
-        <span>{priceInfo?.total_supply}</span>
+        <span>{tickersData?.total_supply}</span>
       </OverviewItem>
       <OverviewItem>
         <span>Max Supply:</span>
-        <span>{priceInfo?.max_supply}</span>
+        <span>{tickersData?.max_supply}</span>
       </OverviewItem>
     </Overview>
     <Tabs>
@@ -195,7 +200,7 @@ function Coin() {
       <Tab isActive = {priceMatch !== null}>
     <Link to ={`/${coinId}/price`}>Price</Link>
       </Tab>
-    </Tabs>
+    </Tabs>  
     <Switch>
       <Route path={`/${coinId}/price`}>
         <Price/>
