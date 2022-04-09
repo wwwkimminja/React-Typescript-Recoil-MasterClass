@@ -15,11 +15,12 @@ market_cap: number;
 
 interface ChartProps {
     coinId:string;
+    isDark:boolean;
 }
 
-function Chart({coinId}:ChartProps){
+function Chart({coinId,isDark}:ChartProps){
     const {isLoading,data} =useQuery<IHistorical[]>(["ohlcv",coinId],()=>fetchCoinHistory(coinId),{
-        refetchInterval:10000
+       // refetchInterval:10000
     });
     return <div> {isLoading ? "Loading chart..." : (
     <ApexChart type= "line" 
@@ -34,7 +35,7 @@ function Chart({coinId}:ChartProps){
    
     options={{
         theme:{
-            mode:"dark",
+            mode:isDark?"dark":"light",
         },
         chart:{
             height:300,
@@ -70,16 +71,17 @@ function Chart({coinId}:ChartProps){
         fill:{
             type:"gradient",
             gradient:{
-                gradientToColors: ["#4cd137"],stops:[0,100]},
+                gradientToColors: ["#4cd137"],stops:[0,100]
             },
+        },
             colors: ["#00a8ff"],
             tooltip: {
                 y:{
                     //2 decimal place
                     formatter:(value) =>`$${value.toFixed(2)}`,
                 },
-            }
-    }}
+            },
+}}
     />
     )}
     </div>

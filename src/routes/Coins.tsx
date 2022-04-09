@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { useQuery } from "react-query";
@@ -17,10 +18,14 @@ const Header = styled.header`
   justify-content: center;
   align-items: center;
 `;
+const ToggleBtn = styled.div`
+  width: 70px;
+  height: 30px;
+`
 const CoinList = styled.ul``;
 const Coin = styled.li`
   background-color: white;
-  color: ${(props) => props.theme.bgColor};
+  color: #2f3640;
   margin-bottom: 15px;
   padding: 20px;
   border-radius: 15px;
@@ -61,9 +66,13 @@ interface ICoin {
     type: string,
 
 }
-function Coins(){
+
+interface ICoinsProps {
+  toggleDark : () => void;
+}
+function Coins({toggleDark}:ICoinsProps){
     const {isLoading,data} = useQuery<ICoin[]>("allCoins",fetchCoins);
- 
+
   return (
     <Container>
       <Helmet>
@@ -71,6 +80,8 @@ function Coins(){
       </Helmet>
       <Header>
         <Title>Coins</Title>
+        <button onClick={toggleDark}>Toggle button</button>
+      
       </Header>
       {isLoading ? <Loader>Loading...</Loader>:(
 

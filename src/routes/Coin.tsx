@@ -27,6 +27,22 @@ const Loader = styled.div`
 text-align:center;
 `;
 
+const HomeBtn = styled.div`
+  width:70px;
+  height: 30px;
+  border-radius: 10px;
+  background-color: #7f8fa6;
+  text-align: center;
+
+`;
+
+const ToggleBtn = styled.div`
+  width:70px;
+  height: 30px;
+  border-radius: 10px;
+  background-color: #7f8fa6;
+`;
+
 const Overview = styled.div`
 display: flex;
 justify-content: space-between;
@@ -135,17 +151,21 @@ volume_24h_change_24h :number;
 
   }
 }
-function Coin(){
+interface ICoinProps {
+  isDark: boolean;
+}
+function Coin({isDark}:ICoinProps){
 
  const {coinId} = useParams<RoutParams>();
   const {state} = useLocation<RouteState>();
   const {isLoading:infoLoading,data:infoData} = useQuery<IInfoData>(["info",coinId], () => fetchCoinInfo(coinId));
   const {isLoading:tickerLoading,data:tickersData} = useQuery<ITickersData>(["tickers",coinId], () => fetchCoinTickers(coinId),{
-    refetchInterval:5000,
+    //refetchInterval:5000,
   });
    
   const priceMatch = useRouteMatch("/:coinId/price");
   const chartMatch = useRouteMatch("/:coinId/chart");
+  
 
   const loading = infoLoading || tickerLoading ;
   
@@ -155,7 +175,11 @@ function Coin(){
       <title>{state?.name ? state.name: loading ? "Loading...": infoData?.name}</title>
       </Helmet>
   <Header>
+    <Link to={`/`}>
+   <HomeBtn>Home</HomeBtn>
+   </Link>
     <Title>{state?.name ? state.name: loading ? "Loading...": infoData?.name}</Title>
+
   </Header>
   {loading ? (<Loader>Loading...</Loader>):(
     <>
@@ -194,10 +218,10 @@ function Coin(){
     </Tabs>  
     <Switch>
       <Route path={`/${coinId}/price`}>
-        <Price/>
+        <Price coinId={coinId}/>
       </Route>
       <Route path={`/${coinId}/chart`}>
-        <Chart coinId={coinId}/>
+        <Chart isDark = {isDark} coinId={coinId}/>
       </Route>
     </Switch>
     </>
