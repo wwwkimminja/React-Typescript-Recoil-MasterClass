@@ -152,9 +152,9 @@ volume_24h_change_24h :number;
   }
 }
 interface ICoinProps {
-  isDark: boolean;
+
 }
-function Coin({isDark}:ICoinProps){
+function Coin({}:ICoinProps){
 
  const {coinId} = useParams<RoutParams>();
   const {state} = useLocation<RouteState>();
@@ -221,7 +221,7 @@ function Coin({isDark}:ICoinProps){
         <Price coinId={coinId}/>
       </Route>
       <Route path={`/${coinId}/chart`}>
-        <Chart isDark = {isDark} coinId={coinId}/>
+        <Chart  coinId={coinId}/>
       </Route>
     </Switch>
     </>
